@@ -1,3 +1,6 @@
+# -*- coding: utf-8 -*-
+"""
+"""
 
 # from datetime import datetime, date
 import datetime
@@ -32,7 +35,7 @@ class User(BaseModel):
 
 
 class Exercise(BaseModel):
-    name = CharField()
+    name = CharField(unique=True)
 
 
 # Multilanguage Support
@@ -53,8 +56,9 @@ class Session(BaseModel):
 class Set(BaseModel):
     session = ForeignKeyField(Session)
     exercise = ForeignKeyField(Exercise)
-    weight = DecimalField()
+    weight = DecimalField(max_digits=2, decimal_places=2)
     repetitions = IntegerField()
+    rpe = DecimalField(max_digits=2, decimal_places=1, null=True)
 
 
 def create_tables():
@@ -68,7 +72,7 @@ if __name__ == '__main__':
 
     lutz = User.create(username='Lutz', password='test', email=None)
 
-    session = Session.create(user=lutz, date='2014-08-17', 
+    session = Session.create(user=lutz, date='2014-08-17',
                              note=("Kniebeuge 157,5x1\n"
                                    "Dücken 62,5x1\n"
                                    "Kreuzheben 180x1\n"
@@ -89,13 +93,13 @@ if __name__ == '__main__':
         except Exercise.DoesNotExist:
             exercise = Exercise.create(name=exercise)
         for set_number in range(1, number_of_sets + 1):
-            Set.create(session=session, 
-                       exercise=exercise, 
-                       weight=weight, 
+            Set.create(session=session,
+                       exercise=exercise,
+                       weight=weight,
                        repetitions=repetitions)
 
 
     for s in Set.select().where(Set.session==session):
         print(s.exercise.name, s.weight, s.repetitions)
 
-        
+
